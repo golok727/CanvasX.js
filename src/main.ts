@@ -1,5 +1,5 @@
 import "./style.css";
-import { CanvasX } from "../lib";
+import { CanvasX, Vector } from "../lib";
 import { CanvasCreateOptions } from "../lib/canvasx";
 
 const canvasEl = document.querySelector("[data-canvas]") as HTMLCanvasElement;
@@ -18,13 +18,19 @@ class Canvas extends CanvasX {
 
 	Begin() {
 		console.log("Radhey Shyam");
+		const vec = Vector.new([1, 2, 2]);
+		vec.add(10);
+		console.log(vec);
+		this.rect(square.x, square.y, square.w, square.h);
+		this.fill("orange");
+		this.noTick();
 	}
 
 	Tick(delta: number) {
+		console.log("run");
 		this.clear();
-		this.beginPath();
+
 		this.rect(square.x, square.y, square.w, square.h);
-		this.closePath();
 
 		const playerXMovement = (50 * delta) / 1000;
 		square.x += playerXMovement;

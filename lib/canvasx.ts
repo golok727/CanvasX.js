@@ -18,7 +18,8 @@ class CanvasX {
 	private canvasHeight!: number;
 	private allowTick: boolean = true;
 
-	protected ctx!: CanvasRenderingContext2D;
+	angleMode: "degrees" | "radians" = "radians";
+	private ctx!: CanvasRenderingContext2D;
 
 	constructor(options: CanvasCreateOptions) {
 		this.__int(options);
@@ -82,7 +83,7 @@ class CanvasX {
 			this.allowTick = false;
 		}
 	}
-
+	/** Checks and returns a boolean weather the tick is enabled or not */
 	isTickEnabled() {
 		return this.allowTick;
 	}
@@ -92,7 +93,9 @@ class CanvasX {
 	}
 
 	rect(...args: Parameters<CanvasRenderingContext2D["rect"]>) {
+		this.beginPath();
 		this.ctx.rect(...args);
+		this.closePath();
 	}
 
 	setFill(color: string) {
