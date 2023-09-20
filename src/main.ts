@@ -19,8 +19,9 @@ class Canvas extends CanvasX {
 	Begin() {
 		console.log("Radhey Shyam");
 		const vec = Vector.new([1, 2, 2]);
-		vec.add(10);
-		console.log(vec);
+		vec.mult(0.8);
+
+		console.log(vec.toString());
 		this.rect(square.x, square.y, square.w, square.h);
 		this.fill("orange");
 		this.noTick();
