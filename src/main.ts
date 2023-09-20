@@ -1,43 +1,33 @@
 import "./style.css";
 import { CanvasX, Vector } from "../lib";
-import { CanvasCreateOptions } from "../lib/canvasx";
 
-const canvasEl = document.querySelector("[data-canvas]") as HTMLCanvasElement;
+const canvas = document.querySelector("[data-canvas]") as HTMLCanvasElement;
 
-const square = {
-	x: 100,
-	y: 100,
-	w: 100,
-	h: 100,
-};
+class MyCanvas extends CanvasX {
+	rectangle: { loc: Vector; w: number; h: number };
 
-class Canvas extends CanvasX {
-	constructor(options: CanvasCreateOptions) {
-		super(options);
+	constructor() {
+		super({ canvas });
+
+		this.rectangle = { loc: Vector.new(300), w: 200, h: 100 };
 	}
 
-	Begin() {
-		console.log("Radhey Shyam");
-		const vec = Vector.new([1, 2, 2]);
-		vec.mult(0.8);
+	OnBegin() {
+		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
 
-		console.log(vec.toString());
-		this.rect(square.x, square.y, square.w, square.h);
 		this.fill("orange");
-		this.noTick();
 	}
 
-	Tick(delta: number) {
-		console.log("run");
+	Tick(_delta: number) {
 		this.clear();
 
-		this.rect(square.x, square.y, square.w, square.h);
+		this.rectangle.loc.add([0.9, 0.2]);
 
-		const playerXMovement = (50 * delta) / 1000;
-		square.x += playerXMovement;
+		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
 
-		this.fill("orange");
+		this.fill("#f50");
 	}
 }
 
-new Canvas({ canvas: canvasEl });
+const c = new MyCanvas();
+c.render();

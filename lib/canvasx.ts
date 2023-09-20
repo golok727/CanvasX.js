@@ -1,3 +1,5 @@
+import { Vector } from ".";
+
 export interface CanvasCreateOptions {
 	width?: number;
 	height?: number;
@@ -6,8 +8,26 @@ export interface CanvasCreateOptions {
 }
 
 /**
+ * @description
  * CanvasX is a base class for creating and managing HTML canvas elements.
  * Subclasses can override the Begin and Tick methods for custom functionality.
+ * @example
+ * 	const canvas = document.querySelector('canvas')
+ *
+ * class MyCanvas extends CanvasX {
+ * 		constructor() {
+ * 			super({ canvas })
+ * 			this.square = {x: 0 , y: 0, w: 0, h: 0}
+ * 	}
+ * 	OnBegin() {
+ * 			// For Rendering your first frame or setup
+ * 	}
+ * 	Tick(delta: number) {
+ * 	 	// code to run per frame
+ * 	}
+ *  }
+ *
+ * new Canvas().render() // Initialize and call the render method to render the canvas
  */
 
 class CanvasX {
@@ -17,17 +37,14 @@ class CanvasX {
 	private canvasWidth!: number;
 	private canvasHeight!: number;
 	private allowTick: boolean = true;
+	private isReady: boolean = false;
+	private animationFrameId: number | null = null;
 
 	angleMode: "degrees" | "radians" = "radians";
 	private ctx!: CanvasRenderingContext2D;
 
 	constructor(options: CanvasCreateOptions) {
-		this.__int(options);
-		this.Begin();
-
-		if (this.allowTick) {
-			requestAnimationFrame(this.__tick.bind(this));
-		}
+		this.__init(options);
 	}
 
 	/*--------------------------------------------- */
@@ -37,7 +54,7 @@ class CanvasX {
 	 * Subclasses can override this method to perform initialization.
 	 */
 
-	Begin() {
+	protected OnBegin() {
 		// Subclass-specific initialization code goes here.
 	}
 
@@ -46,7 +63,7 @@ class CanvasX {
 	 * @param delta - The time elapsed since the last frame in milliseconds.
 	 * Subclasses should override this method to implement animations or updates.
 	 */
-	Tick(_delta: number) {
+	protected Tick(_delta: number) {
 		// Subclass-specific animation/update code goes here.
 	}
 
@@ -55,20 +72,35 @@ class CanvasX {
 	 * Using this method you can add keyboard handling and add interactivity
 	 * Subclasses should override this method to implement keyboard events
 	 */
-	onKeyDown() {}
+	protected onKeyDown() {}
 
 	/**
 	 * This method allow you to access keyboard keys for the current canvas
 	 * Using this method you can add keyboard handling and add interactivity
 	 * Subclasses should override this method to implement keyboard events
 	 */
-	onKeyUp() {}
+	protected onKeyUp() {}
 	/*--------------------------------------------- */
+
+	/** Begins Rendering after setup
+	 * Must be called after the super call to start the render
+	 */
+	render() {
+		if (!this.isReady) {
+			console.warn("Renderer is not initialized yet!!");
+			return;
+		}
+
+		this.OnBegin();
+		if (this.allowTick == true) {
+			this.animationFrameId = requestAnimationFrame(this.__tick.bind(this));
+		}
+	}
 
 	/**
 	 * This will start the animation loop if the animation is stopped
 	 */
-	play() {
+	tickOn() {
 		if (this.allowTick === false) {
 			this.allowTick = true;
 			requestAnimationFrame(this.__tick.bind(this));
@@ -79,8 +111,10 @@ class CanvasX {
 	 * This will stop the animation loop if the animation is enabled
 	 */
 	noTick() {
-		if (this.allowTick === true) {
-			this.allowTick = false;
+		this.allowTick = false;
+		if (this.animationFrameId !== null) {
+			cancelAnimationFrame(this.animationFrameId);
+			this.animationFrameId = null;
 		}
 	}
 	/** Checks and returns a boolean weather the tick is enabled or not */
@@ -88,49 +122,59 @@ class CanvasX {
 		return this.allowTick;
 	}
 
-	clear() {
+	protected clear() {
 		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 	}
 
-	rect(...args: Parameters<CanvasRenderingContext2D["rect"]>) {
+	protected rect(
+		pos: Vector | [number, number],
+		width: number,
+		height: number
+	) {
 		this.beginPath();
-		this.ctx.rect(...args);
+
+		if (Array.isArray(pos)) {
+			this.ctx.rect(pos[0], pos[1], width, height);
+		} else {
+			this.ctx.rect(pos.x, pos.y, width, height);
+		}
+
 		this.closePath();
 	}
 
-	setFill(color: string) {
+	protected setFill(color: string) {
 		this.ctx.fillStyle = color;
 	}
 
-	setStroke(color: string) {
+	protected setStroke(color: string) {
 		this.ctx.strokeStyle = color;
 	}
 
-	setNoStroke() {
+	protected setNoStroke() {
 		this.ctx.lineWidth = 0;
 	}
-	setStrokeWidth(width: number) {
+	protected setStrokeWidth(width: number) {
 		this.ctx.lineWidth = width;
 	}
 
-	fill(color?: string) {
+	protected fill(color?: string) {
 		if (color) this.setFill(color);
 		this.ctx.fill();
 	}
 
-	stroke(color?: string) {
+	protected stroke(color?: string) {
 		if (color) this.setFill(color);
 		this.ctx.stroke();
 	}
 
-	beginPath() {
+	protected beginPath() {
 		this.ctx.beginPath();
 	}
-	closePath() {
+	protected closePath() {
 		this.ctx.closePath();
 	}
 
-	floodFill() {}
+	protected floodFill() {}
 
 	private __tick(time: number) {
 		if (!this.allowTick) {
@@ -140,10 +184,10 @@ class CanvasX {
 		const delta = time - this.lastTime;
 		this.lastTime = time;
 		this.Tick(delta);
-		requestAnimationFrame(this.__tick.bind(this));
+		this.animationFrameId = requestAnimationFrame(this.__tick.bind(this));
 	}
 
-	private __int(options: CanvasCreateOptions) {
+	private __init(options: CanvasCreateOptions) {
 		if (options.canvas) {
 			this.canvas = options.canvas;
 
@@ -152,6 +196,7 @@ class CanvasX {
 
 			this.canvas.width = this.canvasWidth;
 			this.canvas.height = this.canvasHeight;
+			this.isReady = true;
 		} else {
 			if (!options.container) {
 				throw new Error(
@@ -164,6 +209,7 @@ class CanvasX {
 				this.canvas.width = this.canvasWidth;
 				this.canvas.height = this.canvasHeight;
 				options.container.appendChild(this.canvas);
+				this.isReady = true;
 			}
 		}
 
