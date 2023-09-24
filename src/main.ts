@@ -3,6 +3,10 @@ import { CanvasX, Vector } from "../lib";
 
 const canvas = document.querySelector("[data-canvas]") as HTMLCanvasElement;
 
+const v1 = Vector.new([1, 3, 0]);
+
+console.log(v1);
+
 class MyCanvas extends CanvasX {
 	rectangle: { loc: Vector; w: number; h: number };
 
@@ -12,13 +16,14 @@ class MyCanvas extends CanvasX {
 		this.rectangle = { loc: Vector.new(300), w: 200, h: 100 };
 	}
 
-	OnBegin() {
+	override OnBegin() {
 		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
-
 		this.fill("orange");
+
+		this.noTick();
 	}
 
-	Tick(_delta: number) {
+	override Tick(_delta: number) {
 		this.clear();
 
 		this.rectangle.loc.add([0.9, 0.2]);

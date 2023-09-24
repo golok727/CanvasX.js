@@ -30,7 +30,7 @@ export interface CanvasCreateOptions {
  * new Canvas().render() // Initialize and call the render method to render the canvas
  */
 
-class CanvasX {
+abstract class CanvasX {
 	private canvas!: HTMLCanvasElement;
 	private lastTime: number = 0;
 
@@ -48,6 +48,7 @@ class CanvasX {
 	}
 
 	/*--------------------------------------------- */
+
 	// Overridden Methods
 	/**
 	 * This method is called once when the canvas is created.
@@ -56,6 +57,7 @@ class CanvasX {
 
 	protected OnBegin() {
 		// Subclass-specific initialization code goes here.
+		console.warn("OnBegin method should be overridden in the sub class.");
 	}
 
 	/**
@@ -65,6 +67,9 @@ class CanvasX {
 	 */
 	protected Tick(_delta: number) {
 		// Subclass-specific animation/update code goes here.
+		console.warn("Tick method should be overridden in the sub class.");
+		this.noTick();
+		return;
 	}
 
 	/**
@@ -122,15 +127,11 @@ class CanvasX {
 		return this.allowTick;
 	}
 
-	protected clear() {
+	clear() {
 		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 	}
 
-	protected rect(
-		pos: Vector | [number, number],
-		width: number,
-		height: number
-	) {
+	rect(pos: Vector | [number, number], width: number, height: number) {
 		this.beginPath();
 
 		if (Array.isArray(pos)) {
@@ -142,39 +143,39 @@ class CanvasX {
 		this.closePath();
 	}
 
-	protected setFill(color: string) {
+	setFill(color: string) {
 		this.ctx.fillStyle = color;
 	}
 
-	protected setStroke(color: string) {
+	setStroke(color: string) {
 		this.ctx.strokeStyle = color;
 	}
 
-	protected setNoStroke() {
+	setNoStroke() {
 		this.ctx.lineWidth = 0;
 	}
-	protected setStrokeWidth(width: number) {
+	setStrokeWidth(width: number) {
 		this.ctx.lineWidth = width;
 	}
 
-	protected fill(color?: string) {
+	fill(color?: string) {
 		if (color) this.setFill(color);
 		this.ctx.fill();
 	}
 
-	protected stroke(color?: string) {
+	stroke(color?: string) {
 		if (color) this.setFill(color);
 		this.ctx.stroke();
 	}
 
-	protected beginPath() {
+	beginPath() {
 		this.ctx.beginPath();
 	}
-	protected closePath() {
+	closePath() {
 		this.ctx.closePath();
 	}
 
-	protected floodFill() {}
+	floodFill() {}
 
 	private __tick(time: number) {
 		if (!this.allowTick) {
