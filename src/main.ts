@@ -3,7 +3,7 @@ import { CanvasX, Vector } from "../lib";
 
 const canvas = document.querySelector("[data-canvas]") as HTMLCanvasElement;
 
-const v1 = Vector.new([1, 3, 0]);
+const v1 = Vector.new([200, 0, 0]);
 
 console.log(v1);
 
@@ -17,9 +17,15 @@ class MyCanvas extends CanvasX {
 	}
 
 	override OnBegin() {
-		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
-		this.fill("orange");
-
+		// this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
+		// this.fill("orange");
+		this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+		this.ctx.strokeStyle = "#fff";
+		this.ctx.lineWidth = 10;
+		this.ctx.lineCap = "round";
+		this.ctx.moveTo(0, 0);
+		this.ctx.lineTo(v1.x, v1.y);
+		this.ctx.stroke();
 		this.noTick();
 	}
 

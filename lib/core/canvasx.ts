@@ -1,4 +1,5 @@
-import { Vector } from ".";
+import { ANGLE_MODE } from "./constants";
+import { Vector } from "..";
 
 export interface CanvasCreateOptions {
 	width?: number;
@@ -39,9 +40,9 @@ abstract class CanvasX {
 	private allowTick: boolean = true;
 	private isReady: boolean = false;
 	private animationFrameId: number | null = null;
+	ctx!: CanvasRenderingContext2D;
 
-	angleMode: "degrees" | "radians" = "radians";
-	private ctx!: CanvasRenderingContext2D;
+	angleMode: keyof typeof ANGLE_MODE = ANGLE_MODE.RADIANS;
 
 	constructor(options: CanvasCreateOptions) {
 		this.__init(options);

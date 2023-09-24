@@ -373,7 +373,7 @@ class Vector {
 		const newHeading = this.heading() + angle;
 		const mag = this.magnitude();
 		this.x = mag * Math.cos(newHeading);
-		this.y = mag * Math.cos(newHeading);
+		this.y = mag * Math.sin(newHeading);
 		return this;
 	}
 	/**
