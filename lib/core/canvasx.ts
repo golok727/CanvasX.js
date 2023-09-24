@@ -99,6 +99,14 @@ abstract class CanvasX {
 	/** Begins Rendering after setup
 	 * Must be called after the super call to start the render
 	 */
+
+	get width() {
+		return this.canvasWidth;
+	}
+	get height() {
+		return this.canvasHeight;
+	}
+
 	render() {
 		if (!this._isReady) {
 			console.warn("Renderer is not initialized yet!!");
@@ -148,8 +156,6 @@ abstract class CanvasX {
 		} else {
 			this.ctx.rect(pos.x, pos.y, width, height);
 		}
-
-		this.closePath();
 	}
 
 	setFill(color: string) {
@@ -183,6 +189,9 @@ abstract class CanvasX {
 	closePath() {
 		this.ctx.closePath();
 	}
+
+	// Todo implement this
+	background(color: string, clear: boolean) {}
 
 	floodFill() {}
 

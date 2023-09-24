@@ -36,7 +36,9 @@ class MyCanvas extends CanvasX {
 			this.noTick();
 			return;
 		}
-		this.clear();
+		// this.clear();
+		this.setFill("#0000001a");
+		this.ctx.fillRect(0, 0, this.width, this.height);
 
 		this.rectangle.loc.add([delta * 0.07, delta * 0.07]);
 
