@@ -1,7 +1,7 @@
 # CanvasX
 CanvasX is a JavaScript library for creating and managing HTML canvas elements.
 
-
+For more docs [See This](/docs/GettingStarted.md)
 
 **This Library is under dev this is just a personal project**
 
