@@ -33,13 +33,21 @@ export interface CanvasCreateOptions {
 
 abstract class CanvasX {
 	private canvas!: HTMLCanvasElement;
+
 	private lastTime: number = 0;
 
 	private canvasWidth!: number;
+
 	private canvasHeight!: number;
+
 	private allowTick: boolean = true;
+
 	private isReady: boolean = false;
+
 	private animationFrameId: number | null = null;
+
+	private frameRate: number = 60;
+
 	ctx!: CanvasRenderingContext2D;
 
 	angleMode: keyof typeof ANGLE_MODE = ANGLE_MODE.RADIANS;
@@ -178,14 +186,27 @@ abstract class CanvasX {
 
 	floodFill() {}
 
+	/**
+	 * @description Sets the frame create at which the renderer renders the canvas
+	 * @param fps the frame rate per second
+	 */
+	setFPS(fps: number) {
+		this.frameRate = fps;
+	}
+
 	private __tick(time: number) {
 		if (!this.allowTick) {
 			return;
 		}
-
+		const targetFrameTime = 1000 / this.frameRate;
 		const delta = time - this.lastTime;
-		this.lastTime = time;
-		this.Tick(delta);
+		console.log(delta);
+
+		if (delta >= targetFrameTime) {
+			this.lastTime = time;
+			this.Tick(delta);
+		}
+
 		this.animationFrameId = requestAnimationFrame(this.__tick.bind(this));
 	}
 
@@ -206,11 +227,14 @@ abstract class CanvasX {
 				);
 			} else {
 				this.canvas = document.createElement("canvas");
-				this.canvasWidth = options.container.offsetWidth;
-				this.canvasHeight = options.container.offsetHeight;
+
+				this.canvasWidth = options.width ?? options.container.offsetWidth;
+				this.canvasHeight = options.height ?? options.container.offsetHeight;
+
 				this.canvas.width = this.canvasWidth;
 				this.canvas.height = this.canvasHeight;
 				options.container.appendChild(this.canvas);
+
 				this.isReady = true;
 			}
 		}
