@@ -40,13 +40,13 @@ abstract class CanvasX {
 
 	private canvasHeight!: number;
 
-	private allowTick: boolean = true;
+	private _allowTick: boolean = true;
 
-	private isReady: boolean = false;
+	private _isReady: boolean = false;
 
-	private animationFrameId: number | null = null;
+	private _animationFrameId: number | null = null;
 
-	private frameRate: number = 60;
+	private _targetFrameRate: number = 60;
 
 	ctx!: CanvasRenderingContext2D;
 
@@ -100,14 +100,14 @@ abstract class CanvasX {
 	 * Must be called after the super call to start the render
 	 */
 	render() {
-		if (!this.isReady) {
+		if (!this._isReady) {
 			console.warn("Renderer is not initialized yet!!");
 			return;
 		}
 
 		this.OnBegin();
-		if (this.allowTick == true) {
-			this.animationFrameId = requestAnimationFrame(this.__tick.bind(this));
+		if (this._allowTick == true) {
+			this._animationFrameId = requestAnimationFrame(this.__tick.bind(this));
 		}
 	}
 
@@ -115,8 +115,8 @@ abstract class CanvasX {
 	 * This will start the animation loop if the animation is stopped
 	 */
 	tickOn() {
-		if (this.allowTick === false) {
-			this.allowTick = true;
+		if (this._allowTick === false) {
+			this._allowTick = true;
 			requestAnimationFrame(this.__tick.bind(this));
 		}
 	}
@@ -125,15 +125,15 @@ abstract class CanvasX {
 	 * This will stop the animation loop if the animation is enabled
 	 */
 	noTick() {
-		this.allowTick = false;
-		if (this.animationFrameId !== null) {
-			cancelAnimationFrame(this.animationFrameId);
-			this.animationFrameId = null;
+		this._allowTick = false;
+		if (this._animationFrameId !== null) {
+			cancelAnimationFrame(this._animationFrameId);
+			this._animationFrameId = null;
 		}
 	}
 	/** Checks and returns a boolean weather the tick is enabled or not */
 	isTickEnabled() {
-		return this.allowTick;
+		return this._allowTick;
 	}
 
 	clear() {
@@ -191,23 +191,22 @@ abstract class CanvasX {
 	 * @param fps the frame rate per second
 	 */
 	setFPS(fps: number) {
-		this.frameRate = fps;
+		this._targetFrameRate = fps;
 	}
 
 	private __tick(time: number) {
-		if (!this.allowTick) {
+		if (!this._allowTick) {
 			return;
 		}
-		const targetFrameTime = 1000 / this.frameRate;
+		const targetFrameTime = 1000.0 / this._targetFrameRate;
 		const delta = time - this.lastTime;
-		console.log(delta);
 
 		if (delta >= targetFrameTime) {
 			this.lastTime = time;
 			this.Tick(delta);
 		}
 
-		this.animationFrameId = requestAnimationFrame(this.__tick.bind(this));
+		this._animationFrameId = requestAnimationFrame(this.__tick.bind(this));
 	}
 
 	private __init(options: CanvasCreateOptions) {
@@ -219,7 +218,7 @@ abstract class CanvasX {
 
 			this.canvas.width = this.canvasWidth;
 			this.canvas.height = this.canvasHeight;
-			this.isReady = true;
+			this._isReady = true;
 		} else {
 			if (!options.container) {
 				throw new Error(
@@ -235,7 +234,7 @@ abstract class CanvasX {
 				this.canvas.height = this.canvasHeight;
 				options.container.appendChild(this.canvas);
 
-				this.isReady = true;
+				this._isReady = true;
 			}
 		}
 

@@ -30,6 +30,12 @@ class MyCanvas extends CanvasX {
 	}
 
 	override Tick(delta: number) {
+		if (this.rectangle.loc.y + this.rectangle.h >= window.innerHeight) {
+			console.log();
+			console.log("Hello");
+			this.noTick();
+			return;
+		}
 		this.clear();
 
 		this.rectangle.loc.add([delta * 0.07, delta * 0.07]);
