@@ -2,8 +2,6 @@ import { ANGLE_MODE } from "./constants";
 
 import Renderer from "./renderer";
 
-import { Vector } from "..";
-
 export interface CanvasCreateOptions {
 	width?: number;
 	height?: number;

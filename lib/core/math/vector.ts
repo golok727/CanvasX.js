@@ -178,7 +178,7 @@ class Vector {
 	 * [ x , y ] \
 	 * [ x ]
 	 */
-	sub(vec: number | Vector): Vector {
+	sub(vec: number | Vector | VecArray): Vector {
 		if (typeof vec === "number") {
 			this.x -= vec;
 			this.y -= vec;
@@ -203,7 +203,7 @@ class Vector {
 	 * [ x , y ] \
 	 * [ x ]
 	 */
-	div(vec: number | Vector): Vector {
+	div(vec: number | Vector | VecArray): Vector {
 		if (typeof vec === "number") {
 			if (vec === 0) {
 				console.warn(
@@ -303,6 +303,9 @@ class Vector {
 	private __isVector(vec: any): vec is Vector {
 		return vec instanceof Vector;
 	}
+	static isVector(vec: any): vec is Vector {
+		return vec instanceof Vector;
+	}
 	/**
 	 * @description Returns the **magnitude(_length_)** of the given vector
 	 * sqrt(x^2 + y^2 + z^2)
@@ -372,6 +375,7 @@ class Vector {
 		// TODO set angle according to the angle mode
 		const newHeading = this.heading() + angle;
 		const mag = this.magnitude();
+
 		this.x = mag * Math.cos(newHeading);
 		this.y = mag * Math.sin(newHeading);
 		return this;
