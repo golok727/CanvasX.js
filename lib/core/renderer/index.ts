@@ -143,6 +143,12 @@ class Renderer {
 		this.drawingCtx.closePath();
 	}
 
+	/**
+	 *
+	 * @param p1
+	 * @param p2
+	 * @param styles
+	 */
 	Line(
 		p1: Vector | [number, number],
 		p2: Vector | [number, number],
