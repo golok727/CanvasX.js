@@ -1,4 +1,7 @@
 import { ANGLE_MODE } from "./constants";
+
+import Renderer from "./renderer";
+
 import { Vector } from "..";
 
 export interface CanvasCreateOptions {
@@ -36,10 +39,6 @@ abstract class CanvasX {
 
 	private lastTime: number = 0;
 
-	private canvasWidth!: number;
-
-	private canvasHeight!: number;
-
 	private _allowTick: boolean = true;
 
 	private _isReady: boolean = false;
@@ -48,12 +47,15 @@ abstract class CanvasX {
 
 	private _targetFrameRate: number = 60;
 
-	ctx!: CanvasRenderingContext2D;
+	private renderer!: Renderer;
 
 	angleMode: keyof typeof ANGLE_MODE = ANGLE_MODE.RADIANS;
 
 	constructor(options: CanvasCreateOptions) {
 		this.__init(options);
+		if (this.canvas) {
+			this.renderer = new Renderer(this.canvas, this);
+		}
 	}
 
 	/*--------------------------------------------- */
@@ -101,10 +103,10 @@ abstract class CanvasX {
 	 */
 
 	get width() {
-		return this.canvasWidth;
+		return this.renderer.width;
 	}
 	get height() {
-		return this.canvasHeight;
+		return this.renderer.height;
 	}
 
 	render() {
@@ -144,57 +146,6 @@ abstract class CanvasX {
 		return this._allowTick;
 	}
 
-	clear() {
-		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-	}
-
-	rect(pos: Vector | [number, number], width: number, height: number) {
-		this.beginPath();
-
-		if (Array.isArray(pos)) {
-			this.ctx.rect(pos[0], pos[1], width, height);
-		} else {
-			this.ctx.rect(pos.x, pos.y, width, height);
-		}
-	}
-
-	setFill(color: string) {
-		this.ctx.fillStyle = color;
-	}
-
-	setStroke(color: string) {
-		this.ctx.strokeStyle = color;
-	}
-
-	setNoStroke() {
-		this.ctx.lineWidth = 0;
-	}
-	setStrokeWidth(width: number) {
-		this.ctx.lineWidth = width;
-	}
-
-	fill(color?: string) {
-		if (color) this.setFill(color);
-		this.ctx.fill();
-	}
-
-	stroke(color?: string) {
-		if (color) this.setFill(color);
-		this.ctx.stroke();
-	}
-
-	beginPath() {
-		this.ctx.beginPath();
-	}
-	closePath() {
-		this.ctx.closePath();
-	}
-
-	// Todo implement this
-	background(color: string, clear: boolean) {}
-
-	floodFill() {}
-
 	/**
 	 * @description Sets the frame create at which the renderer renders the canvas
 	 * @param fps the frame rate per second
@@ -222,11 +173,8 @@ abstract class CanvasX {
 		if (options.canvas) {
 			this.canvas = options.canvas;
 
-			this.canvasWidth = this.canvas.offsetWidth;
-			this.canvasHeight = this.canvas.offsetHeight;
-
-			this.canvas.width = this.canvasWidth;
-			this.canvas.height = this.canvasHeight;
+			this.canvas.width = this.canvas.offsetWidth;
+			this.canvas.height = this.canvas.offsetHeight;
 			this._isReady = true;
 		} else {
 			if (!options.container) {
@@ -236,19 +184,16 @@ abstract class CanvasX {
 			} else {
 				this.canvas = document.createElement("canvas");
 
-				this.canvasWidth = options.width ?? options.container.offsetWidth;
-				this.canvasHeight = options.height ?? options.container.offsetHeight;
+				const canvasWidth = options.width ?? options.container.offsetWidth;
+				const canvasHeight = options.height ?? options.container.offsetHeight;
 
-				this.canvas.width = this.canvasWidth;
-				this.canvas.height = this.canvasHeight;
+				this.canvas.width = canvasWidth;
+				this.canvas.height = canvasHeight;
 				options.container.appendChild(this.canvas);
 
 				this._isReady = true;
 			}
 		}
-
-		this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
-		if (!this.ctx) throw new Error("CanvasX is not supported in your browser");
 	}
 }
 

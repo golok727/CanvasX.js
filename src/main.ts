@@ -29,7 +29,7 @@ class MyCanvas extends CanvasX {
 		// this.noTick();
 	}
 
-	override Tick(delta: number) {
+	override Tick(_delta: number) {
 		if (this.rectangle.loc.y + this.rectangle.h >= window.innerHeight) {
 			console.log();
 			console.log("Hello");
@@ -37,14 +37,6 @@ class MyCanvas extends CanvasX {
 			return;
 		}
 		// this.clear();
-		this.setFill("#0000001a");
-		this.ctx.fillRect(0, 0, this.width, this.height);
-
-		this.rectangle.loc.add([delta * 0.07, delta * 0.07]);
-
-		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
-
-		this.fill("#f50");
 	}
 }
 

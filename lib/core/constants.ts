@@ -21,5 +21,7 @@ export const ROUNDING_MODES = {
 	ROUND: "ROUND",
 } as const;
 
+export const NO_FILL = "NO_FILL" as const;
+export const NO_STROKE = "NO_STROKE" as const;
 export type OUTPUT_T = keyof typeof NUMBER_TYPES;
 export type ROUNDING_MODES_T = keyof typeof ROUNDING_MODES;
