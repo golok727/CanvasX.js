@@ -47,13 +47,14 @@ abstract class CanvasX {
 
 	private renderer!: Renderer;
 
+	Rect!: Renderer["Rect"];
+	Circle!: Renderer["Circle"];
+	Line!: Renderer["Line"];
+
 	angleMode: keyof typeof ANGLE_MODE = ANGLE_MODE.RADIANS;
 
 	constructor(options: CanvasCreateOptions) {
 		this.__init(options);
-		if (this.canvas) {
-			this.renderer = new Renderer(this.canvas, this);
-		}
 	}
 
 	/*--------------------------------------------- */
@@ -188,10 +189,17 @@ abstract class CanvasX {
 				this.canvas.width = canvasWidth;
 				this.canvas.height = canvasHeight;
 				options.container.appendChild(this.canvas);
-
-				this._isReady = true;
 			}
 		}
+
+		if (this.canvas) {
+			this.renderer = new Renderer(this.canvas, this);
+			this.Rect = this.renderer.Rect.bind(this.renderer);
+			this.Circle = this.renderer.Circle.bind(this.renderer);
+			this.Line = this.renderer.Line.bind(this.renderer);
+		}
+		this._isReady = true;
+		console.log(this);
 	}
 }
 

@@ -1,18 +1,18 @@
-import {
-	CircleOptions,
-	CanvasXDefaultStyles,
-	RectangleOptions,
-	CanvasXCircleStyles,
-	defCircleStyles,
-	defRectangleStyles,
-	defLineOptions,
-	CanvasXRectangleStyles,
-	LineOptions,
-	CanvasXLineStyles,
-} from "./styles";
 import { Vector } from "../..";
 import CanvasX from "../canvasx";
-import { NO_FILL, NO_STROKE, PI } from "../constants";
+import { NO_FILL, NO_STROKE } from "../constants";
+import {
+	CanvasXCircleStyles,
+	CanvasXDefaultStyles,
+	CanvasXLineStyles,
+	CanvasXRectangleStyles,
+	CircleOptions,
+	LineOptions,
+	RectangleOptions,
+	defCircleStyles,
+	defLineOptions,
+	defRectangleStyles,
+} from "./styles";
 
 class Renderer {
 	drawingCtx!: CanvasRenderingContext2D;
@@ -32,32 +32,6 @@ class Renderer {
 		const cy = this.height / 2;
 
 		this.drawingCtx.translate(cx, cy);
-
-		this.Rect(Vector.new(200), {
-			height: 100,
-			width: 100,
-			fill: NO_FILL,
-			stroke: "#fa0",
-			strokeWidth: 4,
-			lineDashArray: [20, 10],
-			lineCap: "round",
-		});
-
-		this.Circle(Vector.new([0, -150]), {
-			radius: 100,
-			fill: "hotpink",
-			stroke: "#fff",
-			endAngle: PI,
-			strokeWidth: 5,
-			lineDashArray: [20, 10],
-		});
-
-		this.Line([0, 0], Vector.new([200, 0]), {
-			stroke: "#faa",
-			lineCap: "round",
-			strokeWidth: 4,
-			lineDashArray: [20, 10],
-		});
 	}
 
 	/**
