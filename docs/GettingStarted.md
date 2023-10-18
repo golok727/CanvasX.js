@@ -102,4 +102,4 @@ class MyCanvas extends CanvasX {
 
 ```
 
-
+Now that the canvas is ready let's [Paint...](/docs/FirstCircle.md)

@@ -3,54 +3,56 @@ CanvasX is a JavaScript library for creating and managing HTML canvas elements.
 
 For more docs [See This](/docs/GettingStarted.md)
 
-**This Library is under dev this is just a personal project**
+**This Library is under development this is just a personal project**
 
 
 # Sample usage 
 
-Make a moving rectangle
-
 ```ts
 
 
-import { CanvasX, Vector } from "../lib";
-
-const canvas = document.querySelector("[data-canvas]") as HTMLCanvasElement;
 
 class MyCanvas extends CanvasX {
-
-	rectangle: { loc: Vector; w: number; h: number };
+	obj: { loc: Vector; rad: number };
 
 	constructor() {
-
-		super({ canvas }); // pass in your canvas element
-		this.rectangle = { loc: Vector.new(300), w: 200, h: 100 };
+		super({ canvas });
+		this.obj = { loc: this.center, rad: 20 };
+	}
+	
+	drawMovingObj() {
+		this.Background("#002122", true);
+		this.Circle(this.obj.loc, {
+			radius: this.obj.rad,
+			fill: "orange",
+		}); // More available Rectangle, Line, .... more on the way
 
 	}
-  
-  // Initial Draw
-	OnBegin() {
+	override OnBegin() {
 
-		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
-
-		this.fill("orange");
-
+		this.drawMovingObj();
+		// this.noTick(); Cancel Loop Static Draw
 	}
 
-	Tick(_delta: number) {
+	override Tick(_delta: number) {
+		this.drawMovingObj();
 
-		this.clear();
+		if (this.isMouseDown) {
+			console.log(this.mouseX, this.mouseY)
+		} // check for mouse events
 
-		this.rectangle.loc.add([0.9]);
-
-		this.rect(this.rectangle.loc, this.rectangle.w, this.rectangle.h);
-
-		this.fill("orange");
-
+		this.obj.loc.x = this.mouseX;
+		this.obj.loc.y = this.mouseY;
+	}
+	override onResize(): void {
+		console.log("resize");
+		this.obj.loc.x = this.centerX;
+		this.obj.loc.y = this.centerY;
 	}
 }
 
-new MyCanvas().render();
+const c = new MyCanvas();
+c.render();
 
 
 
@@ -62,7 +64,7 @@ new MyCanvas().render();
 canvas {
   height: 100%;
 }
-V```
+```
 
 
 
