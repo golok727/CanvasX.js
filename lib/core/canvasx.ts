@@ -110,6 +110,23 @@ abstract class CanvasX {
 	protected onKeyUp() {}
 	/*--------------------------------------------- */
 
+	// TODO add event param
+	/**
+	 * called when the mouse is down in the canvas
+	 */
+	onMouseDown() {}
+
+	//TODO add event param
+	/**
+	 * called when the mouse is up in the canvas
+	 */
+	onMouseUp() {}
+
+	/*
+	Todo called when using the scroll wheel 
+	 */
+	onWheel() {}
+
 	/**
 	 * This function is called when the window is resized. Use this to position elements after resize
 	 */
@@ -246,9 +263,11 @@ abstract class CanvasX {
 	}
 	private __handleMouseDown(_ev: MouseEvent) {
 		this.mouse.isDown = true;
+		this.onMouseDown();
 	}
 	private __handleMouseUp(_ev: MouseEvent) {
 		this.mouse.isDown = false;
+		this.onMouseUp();
 	}
 
 	private __applyMouseEvents() {

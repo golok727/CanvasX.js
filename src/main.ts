@@ -6,10 +6,12 @@ const canvas = document.querySelector("[data-canvas]") as HTMLCanvasElement;
 
 class MyCanvas extends CanvasX {
 	obj: { loc: Vector; rad: number };
+	objects: { loc: Vector; rad: number }[];
 
 	constructor() {
 		super({ canvas });
 		this.obj = { loc: this.center, rad: 20 };
+		this.objects = [];
 	}
 	draw() {
 		this.Background("#002122");
@@ -45,32 +47,45 @@ class MyCanvas extends CanvasX {
 			strokeWidth: 8,
 		});
 	}
-	drawMovingObj() {
-		this.Background("#002122", true);
-		this.Circle(this.obj.loc, {
-			radius: this.obj.rad,
+	drawMovingObj(obj: typeof this.obj) {
+		this.Circle(obj.loc, {
+			radius: obj.rad,
 			fill: "orange",
 		});
 	}
 	override OnBegin() {
 		// this.draw();
 
-		this.drawMovingObj();
-		this.noTick();
+		this.drawMovingObj(this.obj);
+		// this.noTick();
+	}
+
+	override onMouseUp(): void {
+		this.objects.push({
+			...this.obj,
+			loc: Vector.new([this.mouseX, this.mouseY]),
+		});
 	}
 
 	override Tick(_delta: number) {
-		this.drawMovingObj();
+		this.Background("#002122", true);
 
-		// if (this.isMouseDown) console.log("Down");
+		this.drawMovingObj(this.obj);
+
+		console.log(this.objects);
+		this.objects.forEach((o) => this.drawMovingObj(o));
+
+		if (this.isMouseDown) {
+			this.obj.rad += 0.4;
+		}
 
 		this.obj.loc.x = this.mouseX;
 		this.obj.loc.y = this.mouseY;
 	}
 	override onResize(): void {
-		console.log("resize");
-		this.obj.loc.x = this.centerX;
-		this.obj.loc.y = this.centerY;
+		// console.log("resize");
+		// this.obj.loc.x = this.centerX;
+		// this.obj.loc.y = this.centerY;
 	}
 }
 
