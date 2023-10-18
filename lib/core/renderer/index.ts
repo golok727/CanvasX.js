@@ -1,3 +1,4 @@
+import { CanvasCreateOptions } from "./../canvasx";
 import { Vector } from "../..";
 import CanvasX from "../canvasx";
 import { NO_FILL, NO_STROKE } from "../constants";
@@ -18,39 +19,54 @@ class Renderer {
 	drawingCtx!: CanvasRenderingContext2D;
 	canvas!: HTMLCanvasElement;
 	canvasXCtx!: CanvasX;
+	canvasXOptions: CanvasCreateOptions;
 
-	constructor(canvas: HTMLCanvasElement, context: CanvasX) {
+	constructor(
+		canvas: HTMLCanvasElement,
+		context: CanvasX,
+		canvasXOptions: CanvasCreateOptions
+	) {
 		this.__init(canvas);
 		this.canvasXCtx = context;
-
+		this.canvasXOptions = canvasXOptions;
 		this.__test();
 	}
 
-	private __test() {
-		const cx = this.width / 2;
-
-		const cy = this.height / 2;
-
-		this.drawingCtx.translate(cx, cy);
-	}
+	private __test() {}
 
 	/**
-	 * @descriptions Returns the width of the canvas element
+	 * @description Returns the width of the canvas element
 	 */
 	get width() {
 		return this.canvas.width;
 	}
 
 	/**
-	 * @descriptions Returns the height of the canvas element
+	 * @description Returns the height of the canvas element
 	 */
 	get height() {
 		return this.canvas.height;
 	}
 
-	background() {}
+	get centerX() {
+		return this.canvas.width / 2;
+	}
+	get centerY() {
+		return this.canvas.height / 2;
+	}
 
-	clear() {}
+	Background(color: string, clear?: boolean) {
+		if (clear) {
+			this.ClearCanvas();
+		}
+		this.drawingCtx.fillStyle = color;
+		this.drawingCtx.fillRect(0, 0, this.width, this.height);
+		this.drawingCtx.fill();
+	}
+
+	ClearCanvas() {
+		this.drawingCtx.clearRect(0, 0, this.width, this.height);
+	}
 
 	/**
 	 * @description Draws a circle with given options
@@ -81,6 +97,7 @@ class Renderer {
 		this.__strokeIf(s.stroke);
 
 		this.drawingCtx.closePath();
+		this.__resetStyles();
 	}
 
 	/**
@@ -110,11 +127,12 @@ class Renderer {
 
 		this.__applyStyles(s);
 
-		this.drawingCtx.rect(x, y, s.width, s.height);
+		this.drawingCtx.roundRect(x, y, s.width, s.height, s.borderRadius);
 
 		this.__fillIf(s.fill);
 		this.__strokeIf(s.stroke);
 		this.drawingCtx.closePath();
+		this.__resetStyles();
 	}
 
 	/**
@@ -160,6 +178,7 @@ class Renderer {
 
 		this.__strokeIf(s.stroke);
 		this.drawingCtx.closePath();
+		this.__resetStyles();
 	}
 
 	private __applyStyles(styles: CanvasXDefaultStyles) {
@@ -177,6 +196,12 @@ class Renderer {
 		if (styles.lineDashOffset > 0)
 			this.drawingCtx.lineDashOffset = styles.lineDashOffset;
 	}
+	private __resetStyles() {
+		this.drawingCtx.setLineDash([]);
+		this.drawingCtx.strokeStyle = "";
+		this.drawingCtx.lineCap = "butt";
+		this.drawingCtx.lineJoin = "miter";
+	}
 
 	private __fillIf(fill: string) {
 		if (fill !== NO_FILL) this.drawingCtx.fill();
@@ -184,6 +209,16 @@ class Renderer {
 
 	private __strokeIf(stroke: string) {
 		if (stroke !== NO_STROKE) this.drawingCtx.stroke();
+	}
+
+	private __resizeHandler() {
+		const newWidth = this.canvasXOptions.width ?? this.canvas.offsetWidth;
+		const newHeight = this.canvasXOptions.height ?? this.canvas.offsetHeight;
+		this.canvas.width = newWidth;
+		this.canvas.height = newHeight;
+		this.ClearCanvas();
+		this.canvasXCtx.onResize();
+		this.canvasXCtx.restart();
 	}
 
 	private __init(canvas: HTMLCanvasElement) {
@@ -194,6 +229,8 @@ class Renderer {
 		if (!ctx) throw new Error("CanvasX is not supported in your browser");
 
 		this.drawingCtx = ctx;
+
+		window.addEventListener("resize", this.__resizeHandler.bind(this));
 	}
 }
 

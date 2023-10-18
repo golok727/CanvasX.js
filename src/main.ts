@@ -1,20 +1,19 @@
 import "./style.css";
 import { CanvasX, Vector } from "../lib";
-import { NO_FILL, PI } from "../lib/core/constants";
+import { NO_FILL, NO_STROKE } from "../lib/core/constants";
 
 const canvas = document.querySelector("[data-canvas]") as HTMLCanvasElement;
 
 class MyCanvas extends CanvasX {
-	rectangle: { loc: Vector; w: number; h: number };
+	obj: { loc: Vector; rad: number };
 
 	constructor() {
 		super({ canvas });
-
-		this.rectangle = { loc: Vector.new(10), w: 200, h: 100 };
+		this.obj = { loc: this.center, rad: 20 };
 	}
-
-	override OnBegin() {
-		this.Rect(Vector.new(200), {
+	draw() {
+		this.Background("#002122");
+		this.Rect(Vector.new([this.centerX, this.centerY]), {
 			height: 100,
 			width: 100,
 			fill: NO_FILL,
@@ -24,26 +23,55 @@ class MyCanvas extends CanvasX {
 			lineCap: "round",
 		});
 
-		this.Circle(Vector.new([0, -150]), {
+		this.Rect(Vector.new([100, 200]), {
+			height: 100,
+			width: 100,
+			fill: "#fff",
+			stroke: NO_STROKE,
+			borderRadius: 10,
+		});
+
+		this.Circle(Vector.new([this.centerX, this.centerY - 200]), {
 			radius: 100,
 			fill: "hotpink",
 			stroke: "#fff",
-			endAngle: PI,
 			strokeWidth: 5,
 			lineDashArray: [20, 10],
 		});
 
-		this.Line([0, 0], Vector.new([200, 0]), {
+		this.Line([100, 100], Vector.new([300, 100]), {
 			stroke: "#faa",
 			lineCap: "round",
-			strokeWidth: 4,
-			lineDashArray: [20, 10],
+			strokeWidth: 8,
 		});
+	}
+	drawMovingObj() {
+		this.Background("#002122", true);
+		this.Circle(this.obj.loc, {
+			radius: this.obj.rad,
+			fill: "orange",
+		});
+	}
+	override OnBegin() {
+		// this.draw();
 
+		this.drawMovingObj();
 		this.noTick();
 	}
 
-	override Tick(_delta: number) {}
+	override Tick(_delta: number) {
+		this.drawMovingObj();
+
+		// if (this.isMouseDown) console.log("Down");
+
+		this.obj.loc.x = this.mouseX;
+		this.obj.loc.y = this.mouseY;
+	}
+	override onResize(): void {
+		console.log("resize");
+		this.obj.loc.x = this.centerX;
+		this.obj.loc.y = this.centerY;
+	}
 }
 
 const c = new MyCanvas();

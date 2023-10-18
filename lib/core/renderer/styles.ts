@@ -27,12 +27,14 @@ export interface CircleOptions extends Partial<CanvasXCircleStyles> {
 export interface CanvasXRectangleStyles extends CanvasXDefaultStyles {
 	width: number;
 	height: number;
+	borderRadius: number;
 }
 
 //Rectangle Params
 export interface RectangleOptions extends Partial<CanvasXDefaultStyles> {
 	width: number;
 	height: number;
+	borderRadius?: number;
 }
 
 // Line Complete
@@ -70,6 +72,7 @@ export const defRectangleStyles: CanvasXRectangleStyles = {
 	...defaultStyles,
 	width: 100,
 	height: 100,
+	borderRadius: 0,
 };
 
 export const defLineOptions: CanvasXLineStyles = {

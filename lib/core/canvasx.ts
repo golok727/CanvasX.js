@@ -1,3 +1,4 @@
+import { Vector } from "..";
 import { ANGLE_MODE } from "./constants";
 
 import Renderer from "./renderer";
@@ -47,13 +48,25 @@ abstract class CanvasX {
 
 	private renderer!: Renderer;
 
+	private mouse!: {
+		x: number;
+		y: number;
+		isDown: boolean;
+	};
+
 	Rect!: Renderer["Rect"];
 	Circle!: Renderer["Circle"];
 	Line!: Renderer["Line"];
+	Background!: Renderer["Background"];
 
 	angleMode: keyof typeof ANGLE_MODE = ANGLE_MODE.RADIANS;
 
 	constructor(options: CanvasCreateOptions) {
+		this.mouse = {
+			x: 0,
+			y: 0,
+			isDown: false,
+		};
 		this.__init(options);
 	}
 
@@ -97,17 +110,67 @@ abstract class CanvasX {
 	protected onKeyUp() {}
 	/*--------------------------------------------- */
 
-	/** Begins Rendering after setup
-	 * Must be called after the super call to start the render
+	/**
+	 * This function is called when the window is resized. Use this to position elements after resize
 	 */
+	onResize() {}
 
+	/**
+	 * Returns the fill width of the canvas
+	 */
 	get width() {
 		return this.renderer.width;
 	}
+
+	/**
+	 * Returns the fill height of the canvas
+	 */
 	get height() {
 		return this.renderer.height;
 	}
 
+	/**
+	 * Returns the center  position of the canvas as a two component vector
+	 */
+	get center() {
+		return Vector.new([this.centerX, this.centerY]);
+	}
+	/**
+	 * Gets the center x position of the canvas
+	 */
+	get centerX() {
+		return this.renderer.centerX;
+	}
+	/**
+	 * Gets the center y position of the canvas
+	 */
+	get centerY() {
+		return this.renderer.centerY;
+	}
+
+	/**
+	 * Returns the mouses x position
+	 */
+	get mouseX() {
+		return this.mouse.x;
+	}
+
+	/**
+	 * Returns the mouses y position
+	 */
+	get mouseY() {
+		return this.mouse.y;
+	}
+	/**
+	 * Returns `true` if mouse is down in the canvas else returns `false`
+	 */
+	get isMouseDown() {
+		return this.mouse.isDown;
+	}
+
+	/** Begins Rendering after setup
+	 * Must be called after the super call to start the render
+	 */
 	render() {
 		if (!this._isReady) {
 			console.warn("Renderer is not initialized yet!!");
@@ -118,6 +181,15 @@ abstract class CanvasX {
 		if (this._allowTick == true) {
 			this._animationFrameId = requestAnimationFrame(this.__tick.bind(this));
 		}
+	}
+
+	restart() {
+		if (this._animationFrameId) cancelAnimationFrame(this._animationFrameId);
+		const wasTickEnabled = this.isTickEnabled();
+		this.noTick();
+
+		this._allowTick = wasTickEnabled;
+		this.render();
 	}
 
 	/**
@@ -168,12 +240,37 @@ abstract class CanvasX {
 		this._animationFrameId = requestAnimationFrame(this.__tick.bind(this));
 	}
 
+	private __handleMouseMove(ev: MouseEvent) {
+		this.mouse.x = ev.offsetX;
+		this.mouse.y = ev.offsetY;
+	}
+	private __handleMouseDown(_ev: MouseEvent) {
+		this.mouse.isDown = true;
+	}
+	private __handleMouseUp(_ev: MouseEvent) {
+		this.mouse.isDown = false;
+	}
+
+	private __applyMouseEvents() {
+		this.canvas.addEventListener(
+			"mousemove",
+			this.__handleMouseMove.bind(this)
+		);
+
+		this.canvas.addEventListener(
+			"mousedown",
+			this.__handleMouseDown.bind(this)
+		);
+
+		this.canvas.addEventListener("mouseup", this.__handleMouseUp.bind(this));
+	}
+
 	private __init(options: CanvasCreateOptions) {
 		if (options.canvas) {
 			this.canvas = options.canvas;
 
-			this.canvas.width = this.canvas.offsetWidth;
-			this.canvas.height = this.canvas.offsetHeight;
+			this.canvas.width = options.width ?? this.canvas.offsetWidth;
+			this.canvas.height = options.height ?? this.canvas.offsetHeight;
 			this._isReady = true;
 		} else {
 			if (!options.container) {
@@ -193,10 +290,14 @@ abstract class CanvasX {
 		}
 
 		if (this.canvas) {
-			this.renderer = new Renderer(this.canvas, this);
+			this.__applyMouseEvents();
+			this.renderer = new Renderer(this.canvas, this, options);
+
+			// Bind renderer methods to CanvasX
 			this.Rect = this.renderer.Rect.bind(this.renderer);
 			this.Circle = this.renderer.Circle.bind(this.renderer);
 			this.Line = this.renderer.Line.bind(this.renderer);
+			this.Background = this.renderer.Background.bind(this.renderer);
 		}
 		this._isReady = true;
 		console.log(this);
